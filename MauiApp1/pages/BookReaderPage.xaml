@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MauiApp1.pages.BookReaderPage"
+             xmlns:local="clr-namespace:MauiApp1.pages">
+
+    <VerticalStackLayout Padding="10">
+        <!-- Панель сверху для настроек -->
+        <StackLayout x:Name="SettingsPanel" Orientation="Horizontal" Spacing="10">
+            <Button Text="Оглавление" Clicked="OnTableOfContentsClicked" />
+
+            <Slider x:Name="FontSizeSlider" Minimum="10" Maximum="30" WidthRequest="100" Value="{Binding FontSize}" 
+              ValueChanged="OnFontSizeSliderChanged" />
+
+            <Picker x:Name="BackgroundPicker" SelectedIndexChanged="OnBackgroundChanged" />
+            <Button Text="Назад" Clicked="OnPreviousPageClicked" />
+            <Button Text="Вперед" Clicked="OnNextPageClicked" />
+        </StackLayout>
+
+        <!-- Вывод оглавления -->
+        <ScrollView x:Name="TableOfContentsView" IsVisible="False">
+            <StackLayout>
+                <Label Text="Оглавление" FontSize="20" />
+                <CollectionView ItemsSource="{Binding Book.Chapters}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <StackLayout>
+                                <Button Text="{Binding Title}" Clicked="OnChapterSelected" />
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Отображение текста страниц -->
+
+
+        <StackLayout x:Name="PageView">
+
+            <Label x:Name="PageLabel" Text="{Binding CurrentPageText}" FontSize="{Binding FontSize}" LineBreakMode="WordWrap" />
+
+        </StackLayout>
+    </VerticalStackLayout>
+</ContentPage>
