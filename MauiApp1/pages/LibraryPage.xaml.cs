@@ -7,20 +7,20 @@ namespace MauiApp1.pages
 {
     public partial class LibraryPage : ContentPage
     {
-        public ObservableCollection<Book> Books { get; set; }
+        public ObservableCollection<EpubBook> Books { get; set; }
 
         public LibraryPage()
         {
             InitializeComponent();
             // Subscribe to receive the added book
-            MessagingCenter.Subscribe<AddBookPage, Book>(this, "AddBook", (sender, book) =>
+            MessagingCenter.Subscribe<AddBookPage, EpubBook>(this, "AddBook", (sender, book) =>
             {
                 AddBookToLibrary(book);
             });
         }
 
         // Method for adding a book to the library
-        private void AddBookToLibrary(Book book)
+        private void AddBookToLibrary(EpubBook book)
         {
             // Создаем представление книги с обложкой, названием и автором
             var bookLayout = new VerticalStackLayout { Padding = 10 };

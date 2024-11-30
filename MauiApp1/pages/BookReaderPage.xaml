@@ -5,8 +5,9 @@
              xmlns:local="clr-namespace:MauiApp1.pages">
 
     <VerticalStackLayout Padding="10">
-        <!-- Панель сверху для настроек -->
+
         <StackLayout x:Name="SettingsPanel" Orientation="Horizontal" Spacing="10">
+            <Button Text="Back" Clicked="OnBackClicked" />
             <Button Text="Оглавление" Clicked="OnTableOfContentsClicked" />
 
             <Slider x:Name="FontSizeSlider" Minimum="10" Maximum="30" WidthRequest="100" Value="{Binding FontSize}" 
@@ -17,7 +18,7 @@
             <Button Text="Вперед" Clicked="OnNextPageClicked" />
         </StackLayout>
 
-        <!-- Вывод оглавления -->
+
         <ScrollView x:Name="TableOfContentsView" IsVisible="False">
             <StackLayout>
                 <Label Text="Оглавление" FontSize="20" />
@@ -36,10 +37,16 @@
         <!-- Отображение текста страниц -->
 
 
-        <StackLayout x:Name="PageView">
+        <ScrollView x:Name="PageView" VerticalScrollBarVisibility="Always" HeightRequest="550">
 
-            <Label x:Name="PageLabel" Text="{Binding CurrentPageText}" FontSize="{Binding FontSize}" LineBreakMode="WordWrap" />
+            <Label x:Name="PageLabel"
+               Text="{Binding CurrentPageText}"
+               FontSize="{Binding FontSize}"
+               LineBreakMode="WordWrap"
+               VerticalOptions="StartAndExpand"
+               HorizontalOptions="FillAndExpand" />
 
-        </StackLayout>
+        </ScrollView>
+
     </VerticalStackLayout>
 </ContentPage>

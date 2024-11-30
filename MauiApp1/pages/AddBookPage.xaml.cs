@@ -50,7 +50,7 @@ namespace MauiApp1.pages
                 await DisplayAlert("Ошибка", "Выберите файл перед добавлением", "OK");
                 return;
             }
-            Book newBook = new Book(selectedFilePath);
+            EpubBook newBook = new EpubBook(selectedFilePath);
             MessagingCenter.Send(this, "AddBook", newBook);
             await Navigation.PopModalAsync();
         }

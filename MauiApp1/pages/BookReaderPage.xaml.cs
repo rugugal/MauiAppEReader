@@ -8,7 +8,7 @@ namespace MauiApp1.pages
 {
     public partial class BookReaderPage : ContentPage
     {
-        private readonly Book _book;
+        private readonly EpubBook _book;
         private readonly List<string> _pages = new();
         private int _currentPage = 0;
 
@@ -30,7 +30,7 @@ namespace MauiApp1.pages
             }
         }
 
-        public BookReaderPage(Book book)
+        public BookReaderPage(EpubBook book)
         {
             InitializeComponent();
             _book = book;
@@ -58,8 +58,23 @@ namespace MauiApp1.pages
         private void ReloadPages()
         {
             if (PageView.Width <= 0 || PageView.Height <= 0) return;
+
+            var currentPageBeforeReload = _currentPage; 
             LoadPages(FontSize);
+
+            if (currentPageBeforeReload < _pages.Count)
+            {
+
+                _currentPage = currentPageBeforeReload;
+            }
+            else
+            {
+                _currentPage = 0;  
+            }
+
+            DisplayCurrentPage();
         }
+
         private void LoadPages(double fontSize)
         {
             _pages.Clear();
@@ -72,37 +87,48 @@ namespace MauiApp1.pages
 
             foreach (var chapter in _book.Chapters)
             {
-                var chapterHeader = $"{chapter.Title}\n\n";
-                var chapterContent = chapter.Content;
-                var textToProcess = chapterHeader + chapterContent;
+                var textToProcess = $"{chapter.Title}\n\n{chapter.Content}";
 
                 var pageBuilder = new StringBuilder();
 
-                foreach (var paragraph in textToProcess.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries))
+                // Разбиваем текст на строки, где каждая строка — это часть текста, ограниченная длиной
+                foreach (var line in textToProcess.Split('\n'))
                 {
-                    pageBuilder.Append(paragraph + "\n\n");
+                    // Очищаем строку от лишних пробелов
+                    var trimmedLine = line.Trim();
+                    if (string.IsNullOrWhiteSpace(trimmedLine)) continue;
 
-                    // Создаем временный Label для измерения текста
+                    // Пробуем добавить текущую строку на страницу
+                    var testText = pageBuilder.Length > 0
+                        ? $"{pageBuilder}\n{trimmedLine}"
+                        : trimmedLine;
+
+                    // Создаем временный Label для оценки размера текста
                     var label = new Label
                     {
-                        Text = pageBuilder.ToString(),
+                        Text = testText,
                         FontSize = fontSize,
                         LineBreakMode = LineBreakMode.WordWrap
                     };
 
                     var sizeRequest = label.Measure(width, height);
 
-                    // Проверяем, помещается ли текст на страницу
+                    // Если текст превышает высоту страницы, сохраняем текущую страницу
                     if (sizeRequest.Request.Height > height)
                     {
-                        // Если текст превышает высоту, сохраняем текущую страницу
                         _pages.Add(pageBuilder.ToString().TrimEnd());
                         pageBuilder.Clear();
-                        pageBuilder.Append(paragraph + "\n\n");
+                        pageBuilder.Append(trimmedLine);
+                    }
+                    else
+                    {
+                        // Текст помещается, продолжаем добавлять
+                        pageBuilder.Clear();
+                        pageBuilder.Append(testText);
                     }
                 }
 
-                // Добавляем остатки текста из главы на новую страницу
+                // Добавляем оставшийся текст из главы
                 if (pageBuilder.Length > 0)
                 {
                     _pages.Add(pageBuilder.ToString().TrimEnd());
@@ -111,6 +137,9 @@ namespace MauiApp1.pages
 
             DisplayCurrentPage();
         }
+
+
+
 
 
 
@@ -155,7 +184,8 @@ namespace MauiApp1.pages
             var selectedChapter = _book.Chapters.FirstOrDefault(c => c.Title == button.Text);
             if (selectedChapter != null)
             {
-                _currentPage = _pages.FindIndex(p => p.Contains(selectedChapter.Title));
+                _currentPage = _pages.FindIndex(p => p.StartsWith(selectedChapter.Title, StringComparison.OrdinalIgnoreCase));
+
                 if (_currentPage == -1) _currentPage = 0; // Если не нашли, начинаем с начала
                 TableOfContentsView.IsVisible = false; // Скрываем оглавление
                 DisplayCurrentPage();
@@ -172,24 +202,29 @@ namespace MauiApp1.pages
             GoToNextPage();
         }
 
-        private void GoToPreviousPage()
+        private async void GoToPreviousPage()
         {
             if (_currentPage > 0)
             {
                 _currentPage--;
                 DisplayCurrentPage();
+                await PageView.ScrollToAsync(0, 0, true);
             }
         }
 
-        private void GoToNextPage()
+        private async void GoToNextPage()
         {
             if (_currentPage < _pages.Count - 1)
             {
                 _currentPage++;
                 DisplayCurrentPage();
+                await PageView.ScrollToAsync(0, 0, true);
             }
         }
 
-       
+        private async void OnBackClicked(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(new LibraryPage());
+        }
     }
 }

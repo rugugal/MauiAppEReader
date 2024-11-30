@@ -5,22 +5,20 @@
              Title="LibraryPage">
 
 
-    <VerticalStackLayout Padding="20">
-        <Label 
-            Text="Welcome to the Library!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+    <VerticalStackLayout Padding="20" VerticalOptions="FillAndExpand">
 
-        <ScrollView>
+
+        <Button Text="+" 
+            FontSize="30" 
+            HorizontalOptions="Center" 
+            VerticalOptions="EndAndExpand" 
+            Clicked="OnAddBookClicked"/>
+        <ScrollView VerticalScrollBarVisibility="Always" HeightRequest="500">
             <StackLayout x:Name="BookStack" Padding="10" Spacing="10" VerticalOptions="Start">
                 <!-- Книги -->
             </StackLayout>
         </ScrollView>
 
-        <Button Text="+" 
-                FontSize="30" 
-                HorizontalOptions="Center" 
-                VerticalOptions="EndAndExpand" 
-                Clicked="OnAddBookClicked"/>
+        
     </VerticalStackLayout>
 </ContentPage>
