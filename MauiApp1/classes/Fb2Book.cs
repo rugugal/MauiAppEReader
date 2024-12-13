@@ -10,35 +10,42 @@ using Fb2.Document.Models.Base;
 
 namespace MauiApp1.classes
 {
-    public class Fb2Book : IBook
+    public class Fb2Book : Book
     {
-        public string FilePath { get; private set; }
-        public string Title { get; private set; }
-        public string Author { get; private set; }
-        public string Description { get; private set; }
-        public List<Chapter> Chapters { get; private set; } = new List<Chapter>();
-        public byte[] CoverImage { get; private set; }
-        private Fb2Document fb2Document;
+        public string id { get;  set; }
+        public string UserId { get;  set; }
+        public string FilePath { get;  set; }
+        public string Title { get;  set; }
+        public string Author { get;  set; }
+        public string Description { get;  set; }
+        public string AddedDate { get; set; }
+
+        public int currentPage { get; set; }
+        public List<Chapter> Chapters { get;  set; } = new List<Chapter>();
+        public byte[] CoverImage { get;  set; }
+
 
         public Fb2Book(string filePath)
         {
             FilePath = filePath;
-
+            Fb2Document fb2Document;
+            currentPage = 0;
             // Загружаем содержимое файла
             string fileContent = File.ReadAllText(filePath);
             fb2Document = new Fb2Document();
             fb2Document.Load(fileContent);
-
+            UserId = App._authClient.User.Info.Uid;
             // Инициализация полей
-            Title = fb2Document.Title.Content[1].ToString().Replace($"{Environment.NewLine}", " ");
-            Author = fb2Document.Title.Content[2].ToString();
+            Author = fb2Document.Title.Content[1].ToString().Replace($"{Environment.NewLine}", " ");
+            Title = fb2Document.Title.Content[2].ToString();
             Description = fb2Document.Title.Content[3].ToString();
-
+            AddedDate = DateTime.Now.ToString();
             // Обработка глав
             foreach (var page in fb2Document.Bodies[0].Content)
             {
                 ProcessNode(page, Chapters);
             }
+            Chapters.Add(new Chapter("Конец", "Конец"));
             string base64Image = fb2Document.BinaryImages[0].ToString().Replace("data:image/jpeg;base64,", "");
 
             CoverImage = Convert.FromBase64String(base64Image);
@@ -48,32 +55,27 @@ namespace MauiApp1.classes
         {
             string title = "";
             string content = node.ToString();
-
-            // Если текущий узел является контейнером
             if (node is Fb2Container fb2Cont)
             {
-                // Проверяем наличие заголовка
                 var titleNode = fb2Cont.GetDescendants(ElementNames.Title).FirstOrDefault();
                 if (titleNode != null)
                 {
                     title = titleNode.ToString().Trim();
                 }
-
-                // Добавляем текущую главу
-                chapters.Add(new Chapter(title, content));
-
-                // Обрабатываем вложенные узлы
                 if (fb2Cont.GetDescendants(ElementNames.BookBodySection).FirstOrDefault() != null)
                 {
                     foreach (var childNode in fb2Cont.Content)
                     {
-                        ProcessNode(childNode, chapters); // Рекурсивный вызов для вложенных глав
+                        ProcessNode(childNode, chapters);
                     }
+                }
+                else
+                {
+                    chapters.Add(new Chapter(title, content));
                 }
             }
             else
             {
-                // Если это не контейнер, добавляем узел как главу без заголовка
                 chapters.Add(new Chapter(title, content));
             }
         }

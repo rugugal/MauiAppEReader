@@ -4,52 +4,78 @@ using System.IO;
 using System.Text;
 using VersOne.Epub;
 using MauiApp1.interfaces;
+using Firebase.Database.Query;
+using Firebase.Auth;
 
 namespace MauiApp1.classes
 {
-    public class EpubBook : IBook
+    public class EpubBook : Book
     {
-        public string FilePath { get; private set; }
-        public string Title { get; private set; }
-        public string Author { get; private set; }
-        public string Description { get; private set; }
-        public List<Chapter> Chapters { get; private set; }
-        public byte[] CoverImage { get; private set; }
+        public string id { get;  set; }
+        public string UserId { get;  set; }
+        public string FilePath { get;  set; }
+        public string Title { get;  set; }
+        public string Author { get;  set; }
+        public string Description { get;  set; }
+        public List<Chapter> Chapters { get;  set; }
+        public int currentPage { get; set; }
+        public string AddedDate { get; set; }
+        public byte[] CoverImage { get;  set; }
+
+        public VersOne.Epub.EpubBook epubBook;
 
         public EpubBook(string filePath)
         {
             FilePath = filePath;
-            VersOne.Epub.EpubBook epubBook = EpubReader.ReadBook(filePath);
-            Title = epubBook.Title;
-            Author = epubBook.Author;
-            Description = epubBook.Description;
-            CoverImage = epubBook.CoverImage;
+            currentPage = 0;
+            epubBook = EpubReader.ReadBook(filePath);
+            Title = epubBook.Title ?? "";
+            Author = epubBook.Author ?? "";
+            Description = epubBook.Description ?? "";
+            CoverImage = epubBook.CoverImage ?? File.ReadAllBytes("placeholder.png");
             Chapters = new List<Chapter>();
-
-
+            UserId = App._authClient.User.Info.Uid;
+            AddedDate = DateTime.Now.ToString();
             var bookRef = EpubReader.OpenBook(FilePath);
-
+            var navigation = bookRef.GetNavigation();
             var titles = new Dictionary<string, string>();
-            var navigationItems = GetNavigationItems(bookRef.GetNavigation(), titles);
-
-            // Сопоставление глав с контентом из ReadingOrder
-            int chapterIndex = 0;
-            foreach (var navigationItem in navigationItems)
+            var navigationItems = GetNavigationItems(navigation, titles);
+            if (navigationItems.Count == 0)
             {
-                string chapterContent;
-                while (epubBook.ReadingOrder[chapterIndex].Key != navigationItem.Key) {
+                AddChaptersFromReadingOrderWithoutNavigation();
+            }
+            else
+            {
+                int chapterIndex = 0;
+                foreach (var navigationItem in navigationItems)
+                {
+                    string chapterContent;
+                    while (epubBook.ReadingOrder[chapterIndex].Key != navigationItem.Key)
+                    {
+                        chapterContent = ExtractPlainText(epubBook.ReadingOrder[chapterIndex].Content);
+                        Chapters.Add(new Chapter("", chapterContent));
+                        chapterIndex++;
+                    }
                     chapterContent = ExtractPlainText(epubBook.ReadingOrder[chapterIndex].Content);
-                    Chapters.Add(new Chapter("", chapterContent));
+                    Chapters.Add(new Chapter(navigationItem.Value, chapterContent));
                     chapterIndex++;
                 }
-                chapterContent = ExtractPlainText(epubBook.ReadingOrder[chapterIndex].Content);
-                Chapters.Add(new Chapter(navigationItem.Value, chapterContent));
-                chapterIndex++;
-
+                for (int i = chapterIndex; i < epubBook.ReadingOrder.Count; i++)
+                {
+                    var chapterContent = ExtractPlainText(epubBook.ReadingOrder[i].Content);
+                    Chapters.Add(new Chapter("", chapterContent));
+                }
+            }
+            Chapters.Add(new Chapter("Конец", "Конец"));
+        }
+        private void AddChaptersFromReadingOrderWithoutNavigation()
+        {
+            foreach (var item in epubBook.ReadingOrder)
+            {
+                var chapterContent = ExtractPlainText(item.Content);
+                Chapters.Add(new Chapter("", chapterContent));
             }
         }
-
-        // получения глав с сохранением их ключей в словарь
         private Dictionary<string, string> GetNavigationItems(List<EpubNavigationItemRef> navigationItemRefs, Dictionary<string, string> titles)
         {
             foreach (var navigationItemRef in navigationItemRefs)

@@ -4,49 +4,57 @@
              x:Class="MauiApp1.pages.BookReaderPage"
              xmlns:local="clr-namespace:MauiApp1.pages">
 
-    <VerticalStackLayout Padding="10">
+    <VerticalStackLayout Padding="10" >
 
-        <StackLayout x:Name="SettingsPanel" Orientation="Horizontal" Spacing="10">
-            <Button Text="Back" Clicked="OnBackClicked" />
-            <Button Text="Оглавление" Clicked="OnTableOfContentsClicked" />
+        <StackLayout  x:Name="SettingsPanel" Orientation="Horizontal" Spacing="10">
+            <Button Text="Back" Clicked="OnBackClicked" FontSize="12"/>
+            <Button Text="Глава" FontSize="12" Clicked="OnTableOfContentsClicked" />
 
-            <Slider x:Name="FontSizeSlider" Minimum="10" Maximum="30" WidthRequest="100" Value="{Binding FontSize}" 
-              ValueChanged="OnFontSizeSliderChanged" />
+            <Slider x:Name="FontSizeSlider" Minimum="10" Maximum="30" WidthRequest="120" Value="{Binding FontSize}" 
+              ValueChanged="OnFontSizeSliderChanged"  />
 
-            <Picker x:Name="BackgroundPicker" SelectedIndexChanged="OnBackgroundChanged" />
-            <Button Text="Назад" Clicked="OnPreviousPageClicked" />
-            <Button Text="Вперед" Clicked="OnNextPageClicked" />
+            <Picker x:Name="BackgroundPicker" TextColor="Black" SelectedIndexChanged="OnBackgroundChanged" />
+           
+            
         </StackLayout>
 
 
         <ScrollView x:Name="TableOfContentsView" IsVisible="False">
-            <StackLayout>
+            <StackLayout >
                 <Label Text="Оглавление" FontSize="20" />
-                <CollectionView ItemsSource="{Binding Book.Chapters}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <StackLayout>
-                                <Button Text="{Binding Title}" Clicked="OnChapterSelected" />
+                <CollectionView ItemsSource="{Binding FilteredChapters}" >
+                    <CollectionView.ItemTemplate >
+                        <DataTemplate >
+                            <StackLayout >
+                                <Button Text="{Binding Title}" Clicked="OnChapterSelected" Margin="2"/>
                             </StackLayout>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
             </StackLayout>
         </ScrollView>
 
         <!-- Отображение текста страниц -->
 
 
-        <ScrollView x:Name="PageView" VerticalScrollBarVisibility="Always" HeightRequest="550">
-
-            <Label x:Name="PageLabel"
-               Text="{Binding CurrentPageText}"
-               FontSize="{Binding FontSize}"
-               LineBreakMode="WordWrap"
-               VerticalOptions="StartAndExpand"
-               HorizontalOptions="FillAndExpand" />
-
+        <ScrollView x:Name="PageView" VerticalScrollBarVisibility="Always" Padding="10">
+            <StackLayout Orientation="Horizontal">
+                <Label x:Name="PageLabel"
+                       Padding="10"
+                   Text="{Binding CurrentPageText}"
+                   FontSize="{Binding FontSize}"
+                   LineBreakMode="WordWrap"
+                   VerticalOptions="StartAndExpand"
+                   HorizontalOptions="FillAndExpand" />
+            </StackLayout>
         </ScrollView>
+
+        <StackLayout  x:Name="NavigationPanel" Orientation="Horizontal" Padding="10" Spacing="10">
+            <Button Text="&lt;" Clicked="OnPreviousPageClicked" FontSize="12" HorizontalOptions="FillAndExpand" />
+            <Button Text=">" FontSize="12" Clicked="OnNextPageClicked" HorizontalOptions="FillAndExpand" /> 
+        </StackLayout>
+
 
     </VerticalStackLayout>
 </ContentPage>
