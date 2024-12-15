@@ -7,7 +7,7 @@
     xmlns:pages="clr-namespace:MauiApp1.pages"
     
     Shell.FlyoutBehavior="Disabled"
-    Title="MauiApp1">
+    Title="MauiApp1" >
 
     <ShellContent
     Title="Sign In"

@@ -22,6 +22,7 @@ namespace MauiApp1.pages
             get => _username;
             private set => SetProperty(ref _username, value);
         }
+
         [ObservableProperty]
         private string _secretMessage;
         public LoginVM(FirebaseAuthClient authClient)

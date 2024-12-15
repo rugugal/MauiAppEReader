@@ -6,6 +6,7 @@ using MauiApp1.classes;
 using MauiApp1.interfaces;
 using Firebase.Database;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace MauiApp1.pages
 {
@@ -63,23 +64,56 @@ namespace MauiApp1.pages
                 return;
             }
 
-            try
+            var successfullyAdded = new List<string>();
+            var failedToAdd = new Dictionary<string, string>(); // Словарь: файл -> причина ошибки
+
+            foreach (var filePath in selectedFilePaths)
             {
-                foreach (var filePath in selectedFilePaths)
+                try
                 {
                     Book newBook = await BookFactory.CreateBookAsync(filePath);
-                    // Можно добавить логику для обработки каждой книги (например, добавление в локальную базу данных)
+                    successfullyAdded.Add(Path.GetFileName(filePath));
                 }
+                catch (Exception ex)
+                {
+                    failedToAdd[filePath] = ex.Message;
+                }
+            }
 
-                await DisplayAlert("Успех", "Все книги добавлены", "OK");
+            // Формируем итоговое сообщение
+            var resultMessage = new StringBuilder();
+            if (successfullyAdded.Count > 0)
+            {
+                resultMessage.AppendLine("Успешно добавлены следующие книги:");
+                foreach (var book in successfullyAdded)
+                {
+                    resultMessage.AppendLine($"- {book}");
+                }
+            }
 
+            if (failedToAdd.Count > 0)
+            {
+                resultMessage.AppendLine();
+                resultMessage.AppendLine("Не удалось добавить следующие файлы:");
+                foreach (var failed in failedToAdd)
+                {
+                    resultMessage.AppendLine($"- {Path.GetFileName(failed.Key)}: {failed.Value}");
+                }
+            }
+
+            await DisplayAlert("Результат", resultMessage.ToString(), "OK");
+
+            // Если хотя бы одна книга была успешно добавлена, переходим к странице библиотеки
+            if (successfullyAdded.Count > 0)
+            {
                 await Application.Current.MainPage.Navigation.PushModalAsync(new LibraryPage());
             }
-            catch (Exception ex)
+            else
             {
-                await DisplayAlert("Ошибка", $"Ошибка при добавлении книг: {ex.Message}", "OK");
+                await DisplayAlert("Ошибка", "Ни одной книги не удалось добавить. Проверьте файлы и попробуйте снова.", "OK");
             }
         }
+
 
         private async void OnBackClicked(object sender, EventArgs e)
         {

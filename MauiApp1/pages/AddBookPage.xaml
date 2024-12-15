@@ -4,7 +4,15 @@
              x:Class="MauiApp1.pages.AddBookPage"
              Title="Загрузить книги">
     <VerticalStackLayout Padding="20">
-        <Button Text="Назад" Clicked="OnBackClicked" HorizontalOptions="Start" WidthRequest="100"/>
+        <Button Clicked="OnBackClicked" 
+        HorizontalOptions="Start" 
+        WidthRequest="60" 
+        BackgroundColor="Transparent">
+            <Button.ImageSource>
+                <FileImageSource File="back.png" />
+            </Button.ImageSource>
+        </Button>
+
         <Label Text="Выберите файлы формата Fb2 или Epub" FontSize="Large" HorizontalOptions="Center"/>
         <Button Text="Выбрать файлы" Clicked="OnSelectFilesClicked"/>
         <CollectionView x:Name="SelectedFilesList" Margin="0,10">

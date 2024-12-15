@@ -28,6 +28,12 @@ namespace MauiApp1.classes
         public Fb2Book(string filePath)
         {
             FilePath = filePath;
+            if (!IsValidFb2File(filePath))
+            {
+                // Вывод предупреждения и пропуск файла
+                Application.Current.MainPage.DisplayAlert("Ошибка", $"Файл \"{Path.GetFileName(filePath)}\" не является корректным FB2.", "OK");
+                return;
+            }
             Fb2Document fb2Document;
             currentPage = 0;
             // Загружаем содержимое файла
@@ -77,6 +83,25 @@ namespace MauiApp1.classes
             else
             {
                 chapters.Add(new Chapter(title, content));
+            }
+        }
+        // Метод для проверки валидности FB2 файла
+        private bool IsValidFb2File(string filePath)
+        {
+            try
+            {
+                // Попытка загрузить документ FB2
+                string fileContent = File.ReadAllText(filePath);
+                Fb2Document fb2Document = new Fb2Document();
+                fb2Document.Load(fileContent);
+
+                // Проверяем, есть ли тела (Bodies) и заголовок
+                return fb2Document.Bodies.Any() && fb2Document.Title != null;
+            }
+            catch
+            {
+                // Если произошла ошибка, файл считается невалидным
+                return false;
             }
         }
 

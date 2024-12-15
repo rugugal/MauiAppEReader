@@ -7,26 +7,35 @@ using MauiApp1.interfaces;
 using Firebase.Database.Query;
 using Firebase.Auth;
 
+
 namespace MauiApp1.classes
 {
     public class EpubBook : Book
     {
-        public string id { get;  set; }
-        public string UserId { get;  set; }
-        public string FilePath { get;  set; }
-        public string Title { get;  set; }
-        public string Author { get;  set; }
-        public string Description { get;  set; }
-        public List<Chapter> Chapters { get;  set; }
+        public string id { get; set; }
+        public string UserId { get; set; }
+        public string FilePath { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string Description { get; set; }
+        public List<Chapter> Chapters { get; set; }
         public int currentPage { get; set; }
         public string AddedDate { get; set; }
-        public byte[] CoverImage { get;  set; }
+        public byte[] CoverImage { get; set; }
 
         public VersOne.Epub.EpubBook epubBook;
 
         public EpubBook(string filePath)
         {
             FilePath = filePath;
+
+            if (!IsValidEpubFile(filePath))
+            {
+                // Предупреждение об ошибке
+                Application.Current.MainPage.DisplayAlert("Ошибка", $"Файл \"{Path.GetFileName(filePath)}\" не является корректным EPUB.", "OK");
+                return;
+            }
+
             currentPage = 0;
             epubBook = EpubReader.ReadBook(filePath);
             Title = epubBook.Title ?? "";
@@ -68,6 +77,7 @@ namespace MauiApp1.classes
             }
             Chapters.Add(new Chapter("Конец", "Конец"));
         }
+
         private void AddChaptersFromReadingOrderWithoutNavigation()
         {
             foreach (var item in epubBook.ReadingOrder)
@@ -76,11 +86,12 @@ namespace MauiApp1.classes
                 Chapters.Add(new Chapter("", chapterContent));
             }
         }
+
         private Dictionary<string, string> GetNavigationItems(List<EpubNavigationItemRef> navigationItemRefs, Dictionary<string, string> titles)
         {
             foreach (var navigationItemRef in navigationItemRefs)
             {
-                titles[navigationItemRef.HtmlContentFileRef.Key] = navigationItemRef.Title;  
+                titles[navigationItemRef.HtmlContentFileRef.Key] = navigationItemRef.Title;
 
                 GetNavigationItems(navigationItemRef.NestedItems, titles);
             }
@@ -103,10 +114,21 @@ namespace MauiApp1.classes
             }
             return sb.ToString();
         }
+
+        // Метод проверки валидности файла EPUB
+        private bool IsValidEpubFile(string filePath)
+        {
+            try
+            {
+                var testEpub = EpubReader.ReadBook(filePath);
+                return testEpub != null && testEpub.ReadingOrder.Any();
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
-
-
-    
 }
 
 

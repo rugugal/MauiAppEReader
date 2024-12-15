@@ -4,7 +4,7 @@
              x:Class="MauiApp1.pages.LoginPage"
              Title="">
     
-    <VerticalStackLayout Padding="20" Spacing="10" BackgroundColor="White">
+    <VerticalStackLayout Padding="20" Spacing="10">
         <Label Text="Войдите в аккаунт" TextColor="Black" FontSize="Large" HorizontalOptions="Center" />
         <Entry Text="{Binding Email}" TextColor="Black" Placeholder="Email" />
         <Entry Text="{Binding Password}" TextColor="Black" Placeholder="Пароль" IsPassword="True" />

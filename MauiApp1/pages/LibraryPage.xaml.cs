@@ -29,7 +29,7 @@ namespace MauiApp1.pages
 
         private void OnPageSizeChanged(object sender, EventArgs e)
         {
-            ScrollMenu.HeightRequest = Window.Height - Panel.Height - SortPicker.Height - SearchBar.Height - 120;
+            ScrollMenu.HeightRequest = Window.Height - Panel.Height  - 120;
         }
         private async Task LoadUserBooksAsync()
         {
@@ -70,7 +70,7 @@ namespace MauiApp1.pages
             {
                 LoadingIndicator.IsRunning = false;
                 LoadingIndicator.IsVisible = false;
-                ScrollMenu.HeightRequest = Window.Height - Panel.Height - SortPicker.Height - SearchBar.Height - 120;
+                ScrollMenu.HeightRequest = Window.Height - Panel.Height -  120;
             }
         }
         private void SortBooks(List<Book> books)
@@ -220,11 +220,15 @@ namespace MauiApp1.pages
             textContainer.Add(bookProgress, 0, 4);
             var deleteButton = new Button
             {
-                Text = "Удалить",
-                HeightRequest = 80,
+                HeightRequest = 40,
                 VerticalOptions = LayoutOptions.Start,
-                HorizontalOptions = LayoutOptions.End
+                HorizontalOptions = LayoutOptions.End,
+                BackgroundColor = Colors.Transparent // Убираем фон
             };
+
+            // Устанавливаем изображение
+            deleteButton.ImageSource = "delete.png";
+
 
             var tapGesture = new TapGestureRecognizer();
             tapGesture.Tapped += (s, e) =>
