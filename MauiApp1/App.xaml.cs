@@ -1,15 +1,35 @@
-﻿using Microsoft.Maui.Controls; 
+﻿using Firebase.Auth;
+using Firebase.Database;
+using Microsoft.Maui.Controls; 
 
 namespace MauiApp1
 {
     public partial class App : Application
     {
-        public App()
+        public static FirebaseAuthClient _authClient;
+        public static FirebaseClient _firebaseClient;
+
+        public App(FirebaseAuthClient authClient, FirebaseClient firebaseClient)
         {
             InitializeComponent();
+            _authClient = authClient;
+            _firebaseClient = firebaseClient;
 
-            // Оборачиваем AppShell в NavigationPage
-            MainPage = new NavigationPage(new AppShell());
+            // Проверяем, есть ли текущий пользователь
+            if (_authClient.User != null)
+            {
+                // Пользователь авторизован, направляем на MainPage
+                MainPage = new AppShell();
+                Shell.Current.GoToAsync("//Library");
+            }
+            else
+            {
+                // Пользователь не авторизован, направляем на SignInPage
+                MainPage = new AppShell();
+                Shell.Current.GoToAsync("//LoginPage");
+            }
+
         }
+
     }
 }

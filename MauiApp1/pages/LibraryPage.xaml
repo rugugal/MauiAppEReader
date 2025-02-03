@@ -1,26 +1,59 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MauiApp1.pages"
              x:Class="MauiApp1.pages.LibraryPage"
-             Title="LibraryPage">
-
-
-    <VerticalStackLayout Padding="20">
-        <Label 
-            Text="Welcome to the Library!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-
-        <ScrollView>
-            <StackLayout x:Name="BookStack" Padding="10" Spacing="10" VerticalOptions="Start">
-                <!-- Книги -->
-            </StackLayout>
-        </ScrollView>
-
-        <Button Text="+" 
-                FontSize="30" 
-                HorizontalOptions="Center" 
+            Title="Моя библиотека">
+    <VerticalStackLayout Padding="10" VerticalOptions="Start">
+        
+        <StackLayout Padding="0,0,0,5" Orientation="Horizontal" x:Name="Panel" Spacing="10">
+            <Button Text="Выйти" 
+                 FontSize="12" 
+                 HorizontalOptions="Start" 
+                 Command="{Binding SignOutCommand}"/>
+            <Label x:Name="Name" HorizontalOptions="Start" VerticalOptions="Center" FontSize="14" Padding="5"/>
+            <Button  x:Name="Btn" Text="Добавить книгу" 
+                FontSize="12" 
+                HorizontalOptions="End" 
                 VerticalOptions="EndAndExpand" 
                 Clicked="OnAddBookClicked"/>
+            <Button Clicked="Load"
+                BackgroundColor="Transparent"
+                HorizontalOptions="Start"
+                HeightRequest="50"
+                AutomationProperties.HelpText="Обновить"
+                VerticalOptions="Center">
+                <Button.ImageSource>
+                    <FileImageSource File="refresh.png" />
+                </Button.ImageSource>
+            </Button>
+        </StackLayout>
+        <ScrollView x:Name="ScrollMenu" VerticalScrollBarVisibility="Always" Padding="10" Background="White">
+            <StackLayout>
+            <SearchBar x:Name="SearchBar" 
+               Placeholder="Поиск по названию или автору" 
+               TextChanged="OnSearchTextChanged" 
+               Margin="10" 
+               />
+
+            <Picker x:Name="SortPicker" SelectedIndexChanged="OnSortChanged"  TextColor="Black" Margin="10" FontSize="14">
+                    <Picker.Items>
+                        <x:String>По дате добавления</x:String>
+                        <x:String>По названию</x:String>
+                        <x:String>По автору</x:String>
+                    </Picker.Items>
+                </Picker>
+            <ActivityIndicator x:Name="LoadingIndicator"
+                       IsRunning="False"
+                       IsVisible="False"
+                       Color="Blue"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"
+                       WidthRequest="50"
+                       HeightRequest="50" />
+            <StackLayout x:Name="BookStack" Spacing="10">
+             </StackLayout>
+
+            </StackLayout>
+        </ScrollView>
     </VerticalStackLayout>
 </ContentPage>

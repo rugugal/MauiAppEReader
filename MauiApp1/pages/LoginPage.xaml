@@ -2,15 +2,13 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiApp1.pages.LoginPage"
-             Title="LoginPage">
+             Title="">
     
     <VerticalStackLayout Padding="20" Spacing="10">
-        <Label Text="Login to Your Account" FontSize="Large" HorizontalOptions="Center" />
-        <Entry Placeholder="Name" />
-        <Entry Placeholder="Email" />
-        <Entry Placeholder="Password" IsPassword="True" />
-        <Button Text="Login" Clicked="OnLoginClicked" HorizontalOptions="Fill" />
-
-        <Button Text="Back to Sign Up" Clicked="OnBackClicked" HorizontalOptions="Fill" />
+        <Label Text="Войдите в аккаунт" TextColor="Black" FontSize="Large" HorizontalOptions="Center" />
+        <Entry Text="{Binding Email}" TextColor="Black" Placeholder="Email" />
+        <Entry Text="{Binding Password}" TextColor="Black" Placeholder="Пароль" IsPassword="True" />
+        <Button Command="{Binding SignInCommand}" Text="Войти" HorizontalOptions="Fill" />
+        <Button Command="{Binding NavigateSignUpCommand}" Text="Нет аккаунта? Зарегистрироваться"  HorizontalOptions="Fill" />
     </VerticalStackLayout>
 </ContentPage>

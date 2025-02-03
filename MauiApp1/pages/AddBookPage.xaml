@@ -2,13 +2,26 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiApp1.pages.AddBookPage"
-             Title="AddBookPage">
+             Title="Загрузить книги">
     <VerticalStackLayout Padding="20">
-        <Label Text="Upload an EPUB file" FontSize="Large" HorizontalOptions="Center"/>
+        <Button Clicked="OnBackClicked" 
+        HorizontalOptions="Start" 
+        WidthRequest="60" 
+        BackgroundColor="Transparent">
+            <Button.ImageSource>
+                <FileImageSource File="back.png" />
+            </Button.ImageSource>
+        </Button>
 
-        <Button Text="Select EPUB File" Clicked="OnSelectFileClicked"/>
-        <Label x:Name="SelectedFileLabel" Text="No file selected" HorizontalOptions="Center" Margin="0,10"/>
-
-        <Button Text="Add Book" Clicked="OnAddBookClicked" x:Name="AddBookButton" HorizontalOptions="Center"/>
+        <Label Text="Выберите файлы формата Fb2 или Epub" FontSize="Large" HorizontalOptions="Center"/>
+        <Button Text="Выбрать файлы" Clicked="OnSelectFilesClicked"/>
+        <CollectionView x:Name="SelectedFilesList" Margin="0,10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding .}" HorizontalOptions="Center"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Text="Добавить книги" Clicked="OnAddBooksClicked" x:Name="AddBooksButton" HorizontalOptions="Center"/>
     </VerticalStackLayout>
 </ContentPage>
